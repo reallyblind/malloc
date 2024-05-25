@@ -20,7 +20,7 @@ using std::endl;
 
 typedef size_t PageID;
 
-//一个span 256KB
+//一个span 128 * 8KB
 //1页8KB
 //128页的span
 //128页的span是直接用系统接口申请的，那就是连续的空间。
@@ -138,11 +138,12 @@ private:
 };
 
 //CentralCache
-struct Span{
+struct Span{    //以页为单位的基本的结构体
 public:
     PageID _pageIDleft = 0;//
     PageID _pageID = 0; //页号
     size_t _n = 0;//当前span管理的页的数量
+
 
     void* _freeList = nullptr;//每个span下面挂的小块空间的头结点
     size_t use_count = 0;//当前span分配出去了多少个块空间

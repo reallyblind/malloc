@@ -1,5 +1,6 @@
 #include "../include/PageCache.h"
 #include <cassert>
+#include <ostream>
 
 PageCache PageCache::_sInst;
 
@@ -13,10 +14,12 @@ Span* PageCache::NewSpan(size_t k)
     if( !_spanLists[k].Empty())
     {
         //直接返回该通中的第一个span
+        cout<<"k号桶中有span"<<endl;
         return _spanLists[k].PopFront();
     }
 
     //② k号桶没有span，但后面的桶中有span
+
     for(int i = k + 1; i < PAGE_NUM; ++i)
     {
         //[k+1, PAGE_NUM -1]号桶中有没有span
@@ -34,6 +37,7 @@ Span* PageCache::NewSpan(size_t k)
 
             // 分一个k页的span
             kSpan->_pageID = nSpan->_pageID;
+            kSpan->_pageIDleft = nSpan->_pageIDleft;
             
             kSpan->_n = k;
 
@@ -44,7 +48,8 @@ Span* PageCache::NewSpan(size_t k)
 
             // n - k页的放回对应哈希桶中
             _spanLists[nSpan->_n].PushFront(nSpan);
-            std::cout<< kSpan <<endl;
+//            std::cout<< kSpan <<endl;
+            cout<<k<<"号桶没有span，但后面的桶"<<i<<"中有span"<<endl;
             return kSpan;
         }
 
@@ -64,9 +69,9 @@ Span* PageCache::NewSpan(size_t k)
         只需要修改_pageID和_n即可，系统调用接口申请空间的时候一定能保证申请的空间是对齐的
     */
     bigSpan->_pageID = ((PageID)ptr) >> PAGE_SHIFT;
-    bigSpan->_pageIDleft = ((PageID)ptr) % ((PageID)1>>PAGE_SHIFT);
+    bigSpan->_pageIDleft = (((PageID)ptr) &0x1fff);
 
-    cout<<"bigSpan->_pageID "<<bigSpan->_pageID <<endl;
+//    cout<<"bigSpan->_pageID "<<bigSpan->_pageID <<endl;
     bigSpan->_n = PAGE_NUM - 1;
 
     //将这个span放到对应哈希桶里

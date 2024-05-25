@@ -34,10 +34,10 @@ void AllocTest()
 void ConcurrentAllocTest1()
 {
 	void* ptr1 = ConcurrentAlloc(5);
-	void* ptr2 = ConcurrentAlloc(5);
-	void* ptr3 = ConcurrentAlloc(5);
-	void* ptr4 = ConcurrentAlloc(5);
-	void* ptr5 = ConcurrentAlloc(5);
+	void* ptr2 = ConcurrentAlloc(8);
+	void* ptr3 = ConcurrentAlloc(4);
+	void* ptr4 = ConcurrentAlloc(5*1024);
+	void* ptr5 = ConcurrentAlloc(3);
 
 	std::cout<< ptr1 <<std::endl;
 	std::cout<< ptr2 <<std::endl;
@@ -62,7 +62,7 @@ void ConcurrentAllocTest2()
 int main()
 {
     //AllocTest();
-	ConcurrentAllocTest1();
+	ConcurrentAllocTest2();
 	
     return 0;
 

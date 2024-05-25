@@ -8,7 +8,7 @@
 //其实就是tcmalloc，线程调用这个函数申请空间
 void *ConcurrentAlloc(size_t size)
 {
-    std::cout<<"ConcurrentAlloc : "<<std::this_thread::get_id()<<" "<<pTLSThreadCache<<std::endl;
+    std::cout<<"申请"<<size<<"空间 ConcurrentAlloc : "<<std::this_thread::get_id()<<" "<<pTLSThreadCache<<std::endl;
     //pTLSThreadCache是TLS的，每个线程都会有一个，且相互独立，所以不存在竞争pTLSThreadCache的问题，所以只需判断一次就可以new
     if(pTLSThreadCache == nullptr)
     {

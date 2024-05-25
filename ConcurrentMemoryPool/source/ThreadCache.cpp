@@ -11,7 +11,7 @@ void* ThreadCache::Allocate(size_t size)    //线程申请size大小的空间
 
     size_t alignSize = SizeClass::RoundUp(size);    //size对齐后的字节数
     size_t index = SizeClass::Index(size);      //size对应在哈希表中的哪个桶 3->0 10->1
-    //std::cout<<"index: " <<index<<endl;
+    std::cout<<"ThreadCache index: " <<index<<endl;
     if( !_freeLists[index].Empty())
     {
         //自由链表不为空，可以直接从自由链表中获取空间
@@ -19,7 +19,7 @@ void* ThreadCache::Allocate(size_t size)    //线程申请size大小的空间
         return _freeLists[index].Pop();  
     }else {
         //自由链表为空，得要让ThreadCache向CentralCache申请空间
-        
+        std::cout<<"自由链表为空，得要让ThreadCache向CentralCache申请空间"<<endl;
         return FetchFromCentralCache(index, alignSize);
     }
     

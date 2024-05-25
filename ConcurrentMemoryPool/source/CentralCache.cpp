@@ -8,6 +8,7 @@
 CentralCache CentralCache::_sInst; //CentralCache的饿汉对象
 
 //cc从自己的_spanLists中为tc提供tc所需要的块空间
+//cc从一个管理空间非空的span中拿出一段batchNum个size大小的块空间
 size_t CentralCache::FetchRangeObj(void* &start, void*& end, size_t batchNum,size_t size)
 {
     //获取到size对应哪一个SpanList
@@ -15,10 +16,10 @@ size_t CentralCache::FetchRangeObj(void* &start, void*& end, size_t batchNum,siz
 
     _spanLists[index]._mtx.lock();
     
-
+    cout<<"获取到"<<size<<"对应SpanList["<<index<<"]"<<endl;
     //获取到一个管理空间非空的span
     Span* span = GetOneSpan(_spanLists[index], size);
-    std::cout<<"return span"<<span<<endl;
+//    std::cout<<"return span"<<span<<endl;
     assert(span);//断言一下span不为空
     assert(span->_freeList);////断言一下span管理的空间不为空
     
@@ -28,10 +29,10 @@ size_t CentralCache::FetchRangeObj(void* &start, void*& end, size_t batchNum,siz
     size_t actualNum = 1; //函数实际的返回值
 
     //在end的next不为空的前提下，让end走batchNum-1步
-    std::cout<<"the point of "<<span->_freeList<<endl;
+//    std::cout<<"the point of "<<span->_freeList<<endl;
 
     size_t i = 0;
-    std::cout<<"end = "<<end<<endl;
+//    std::cout<<"end = "<<end<<endl;
     while(i < batchNum - 1 && ObjNext(end) != nullptr)
     {
         end = ObjNext(end);
@@ -66,12 +67,12 @@ Span* CentralCache::GetOneSpan(SpanList& list, size_t size)
     list._mtx.unlock();
 
     //走到这里就是cc中没有找到管理空间非空的span
-    
+    cout<<"cc中没有找到管理空间非空的span"<<endl;
     //将size转换成匹配的页数，以供pc提供一个合适的span
     size_t k = SizeClass::NumMovePage(size);
 
     
-    size_t size_duiqi = SizeClass::NumMoveSize(size);
+    
 
     //解决死锁的方法3:在调用NewSpan的地方加锁
     PageCache::GetInstance()->_pageMtx.lock();
@@ -91,7 +92,7 @@ Span* CentralCache::GetOneSpan(SpanList& list, size_t size)
     //再通过size来划分块：
 
     //这里要强转一下，因为_pageID是PageID类型(size_t或者unsigned long long)的，不能直接赋值给指针
-    char* start = (char*)(span->_pageID << PAGE_SHIFT);
+    char* start = (char*)((span->_pageID << PAGE_SHIFT) + (span->_pageIDleft));
     char* end = (char*)(start + (span->_n << PAGE_SHIFT));
 
     //开始切分span管理的空间
@@ -99,9 +100,10 @@ Span* CentralCache::GetOneSpan(SpanList& list, size_t size)
 
     void* tail = start; //起初让tail指向start
     start += size; //start往后移动一块，方便控制循环
-
-
-
+    cout<<"span切割为"<<size<<endl;
+/*
+    
+cout << "span->_pageIDleft: " << span->_pageIDleft << endl;
 cout << "span->_pageID: " << span->_pageID << endl;
 cout << "span->_pageID << PAGE_SHIFT: " << (span->_pageID << PAGE_SHIFT) << endl;
 cout << "start address: " << static_cast<void*>(start) << endl;
@@ -113,17 +115,10 @@ cout<<"----------------"<<endl;
     cout<<"span->_freeList" << span->_next<<endl;
     printf("%p\n",start  );
     printf("%p\n",end  );
-    cout << "span: " << span << endl;
-    int i = 0;
-    std::cerr << "Error: start address is not less than end address." << std::endl;
-    if (start <= end) {
-        std::cerr << "Error: start address is not less than end address." << std::endl;
-    }
-    int* tmp = (int*)tail;
-    printf("tail = %p\n",tail);
-    printf("(int*)tail = %p\n",tmp);
-    printf("(int*)tail = %d\n",*tmp);
-    printf("ObjNext(tail) = %p\n",*(void**)tail);
+
+*/
+//    cout << "span: " << span << endl;
+    
     //链接各个块
     while(start < end)
     {
