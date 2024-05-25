@@ -1,0 +1,44 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+      {
+          "name": "GDB",
+          "type": "cppdbg",
+          "request": "launch",
+          "program": "${workspaceFolder}/build/Debug/UnitTest",
+          "args": [],
+          "stopAtEntry": false,
+          "cwd": "${workspaceFolder}",
+          "environment": [],
+          "externalConsole": false,
+          "MIMode": "gdb",
+          "setupCommands": [
+              {
+                  "description": "Enable pretty-printing for gdb",
+                  "text": "-enable-pretty-printing",
+                  "ignoreFailures": true
+              }
+          ],
+          /*
+          "preLaunchTask": "build",
+          "miDebuggerPath": "/usr/bin/gdb",
+          "logging": {
+              "moduleLoad": true,
+              "programOutput": true,
+              "engineLogging": false,
+              "trace": true,
+              "traceResponse": true
+          },
+          "setupCommands": [
+              {
+                  "description": "Enable pretty-printing for gdb",
+                  "text": "-enable-pretty-printing",
+                  "ignoreFailures": true
+              }
+          ],
+          "visualizerFile": "${workspaceFolder}/.vscode/gdb-visualizers/qt.natvis",
+          "showDisplayString": true
+          */
+      }
+  ]
+}
